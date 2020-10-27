@@ -14,6 +14,32 @@ const config = {
     measurementId: "G-J42Y9GZLBT"
   };
 
+  export const createUserProfileDocument = async (userAuth, AdditionalData) => {
+      if(!userAuth) return;
+
+      const userRef = firestore.doc(`users/${userAuth.uid}`);
+
+      const snapShot = await userRef.get();
+
+      if(!snapShot.exists) {
+        const { displayName, email } = userAuth;
+        const createdAt = new Date();
+
+        try {
+          await userRef.set({
+            displayName,
+            email,
+            createdAt,
+            ...AdditionalData
+          });
+        } catch (e){
+          console.log('Error creating user', e.message);
+        }
+      }
+
+      return userRef;
+  }
+
   // Initialize Firebase
   firebase.initializeApp(config);
   //firebase.analytics();
